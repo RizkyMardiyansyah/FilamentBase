@@ -103,6 +103,12 @@ class AdminPanelProvider extends PanelProvider
                     ->isActiveWhen(fn () => request()->is('admin/themes'))
                     ->group('Settings')
                     ->sort(4),
+                NavigationItem::make('Projects')
+                    ->url('/admin/project-names', shouldOpenInNewTab: false)
+                    ->isActiveWhen(fn () => request()->is('admin/projects') || request()->is('admin/project-names') || request()->is('admin/board'))
+                    ->icon('heroicon-m-briefcase')
+                    ->group('Project Management'),
+                    // ->sort(1),
                 
             ]);
              

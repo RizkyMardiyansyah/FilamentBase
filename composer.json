@@ -14,6 +14,7 @@
         "joaopaulolndev/filament-edit-profile": "^1.0",
         "laravel/framework": "^11.9",
         "laravel/tinker": "^2.9",
+        "mokhosh/filament-kanban": "^2.9",
         "owenvoke/blade-fontawesome": "^2.6",
         "pxlrbt/filament-excel": "^2.3",
         "stechstudio/filament-impersonate": "^3.14"
