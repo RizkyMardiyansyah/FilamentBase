@@ -67,7 +67,6 @@ class AdminPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
-                // \Hasnayeen\Themes\Http\Middleware\SetTheme::class,
             ])
             ->databaseNotifications()
             ->authMiddleware([
@@ -75,6 +74,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->tenantMiddleware([
                 ApplyTenantScopes::class,
+                \Hasnayeen\Themes\Http\Middleware\SetTheme::class,
             ], isPersistent: true)
 
             ->plugins([
@@ -89,7 +89,7 @@ class AdminPanelProvider extends PanelProvider
                 ->shouldShowBrowserSessionsForm()
                 ->shouldShowAvatarForm(),
                 \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make(),
-                // \Hasnayeen\Themes\ThemesPlugin::make(),
+                \Hasnayeen\Themes\ThemesPlugin::make(),
             ])
 
             ->userMenuItems([
@@ -104,12 +104,12 @@ class AdminPanelProvider extends PanelProvider
             ])
 
             ->navigationItems([
-                // NavigationItem::make('Themes')
-                //     ->url('/admin/themes')
-                //     ->icon('heroicon-s-paint-brush')
-                //     ->isActiveWhen(fn () => request()->is('admin/themes'))
-                //     ->group('Settings')
-                //     ->sort(4),
+                NavigationItem::make('Themes')
+                    ->url(request()->url() . '/themes')
+                    ->icon('heroicon-s-paint-brush')
+                    ->isActiveWhen(fn () => request()->is('*themes'))
+                    ->group('Settings')
+                    ->sort(4),
                 
             ]);
              
