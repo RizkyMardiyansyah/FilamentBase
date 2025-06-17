@@ -10,10 +10,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Filament\Models\Contracts\HasAvatar;
+use Filament\Models\Contracts\HasTenants;
+use Filament\Panel;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable implements HasAvatar, FilamentUser
+class User extends Authenticatable implements HasAvatar, FilamentUser, HasTenants
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, HasRoles, HasPanelShield;
@@ -29,6 +35,15 @@ class User extends Authenticatable implements HasAvatar, FilamentUser
         'password',
         'avatar_url',
     ];
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(company::class);
+    }
 
     /**
      * The attributes that should be hidden for serialization.
@@ -56,4 +71,20 @@ class User extends Authenticatable implements HasAvatar, FilamentUser
     {
         return $this->avatar_url ? Storage::url("$this->avatar_url") : null;
     }
+
+    public function companies():BelongsToMany
+    {
+        return $this->belongsToMany(company::class);
+    }
+
+    public function getTenants(Panel $panel): array|Collection
+    {
+        return $this->companies;
+    }
+
+    public function canAccessTenant(Model $tenant): bool
+    {
+        return $this->companies->contains($tenant);
+    }
 }
+
