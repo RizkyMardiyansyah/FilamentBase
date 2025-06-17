@@ -10,10 +10,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Filament\Models\Contracts\HasAvatar;
+use Filament\Models\Contracts\HasTenants;
+use Filament\Panel;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Support\Collection;
 
-class User extends Authenticatable implements HasAvatar, FilamentUser
+class User extends Authenticatable implements HasAvatar, FilamentUser, HasTenants
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, HasRoles, HasPanelShield;
@@ -40,6 +46,17 @@ class User extends Authenticatable implements HasAvatar, FilamentUser
         'remember_token',
     ];
 
+
+    // Multi Tenant for user Model
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+    public function team(): BelongsTo
+    {
+        return $this->belongsTo(Team::class);
+    }
+
     /**
      * Get the attributes that should be cast.
      *
@@ -56,4 +73,23 @@ class User extends Authenticatable implements HasAvatar, FilamentUser
     {
         return $this->avatar_url ? Storage::url("$this->avatar_url") : null;
     }
+
+
+    // Multi Tenant
+    public function teams():BelongsToMany
+    {
+        return $this->belongsToMany(Team::class);
+    }
+
+
+    public function getTenants(Panel $panel): array|Collection
+    {
+        return $this->teams;
+    }
+
+    public function canAccessTenant(Model $tenant): bool
+    {
+        return $this->teams->contains($tenant);
+    }
+    // End Multi Tenant
 }

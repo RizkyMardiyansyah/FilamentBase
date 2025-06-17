@@ -5,6 +5,8 @@ namespace App\Providers\Filament;
 use App\Filament\Resources\OrderResource\Widgets\StatsOverview;
 use App\Filament\Resources\UserResource\Widgets\orderOverview;
 use App\Filament\Resources\UserResource\Widgets\userOverview;
+use App\Http\Middleware\ApplyTenantScopes;
+use App\Models\Team;
 use Filament\Forms\Components\Group;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -31,6 +33,7 @@ class AdminPanelProvider extends PanelProvider
     {
         return $panel
             ->default()
+            ->tenant(Team::class)
             ->id('admin')
             ->path('admin')
             ->login()
@@ -70,6 +73,10 @@ class AdminPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ])
+            ->tenantMiddleware([
+                ApplyTenantScopes::class,
+                \Hasnayeen\Themes\Http\Middleware\SetTheme::class,
+            ], isPersistent: true)
             ->plugins([
                 FilamentEditProfilePlugin::make()
                 ->slug('my-profile')
@@ -82,7 +89,6 @@ class AdminPanelProvider extends PanelProvider
                 ->shouldShowBrowserSessionsForm()
                 ->shouldShowAvatarForm(),
                 \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make(),
-                \Hasnayeen\Themes\ThemesPlugin::make(), // Memasukkan plugin tema dengan benar
             ])
 
             ->userMenuItems([
@@ -98,9 +104,9 @@ class AdminPanelProvider extends PanelProvider
 
             ->navigationItems([
                 NavigationItem::make('Themes')
-                    ->url('/admin/themes')
+                    ->url(request()->url() . '/themes')
                     ->icon('heroicon-s-paint-brush')
-                    ->isActiveWhen(fn () => request()->is('admin/themes'))
+                    ->isActiveWhen(fn () => request()->is('*themes'))
                     ->group('Settings')
                     ->sort(4),
                 
